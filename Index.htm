@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Faxkt | Login & Executores</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      background: #0f172a;
+      color: #e2e8f0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+    }
+
+    .container {
+      background: #1e293b;
+      width: 100%; max-width: 420px;
+      border-radius: 20px; overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      position: relative;
+    }
+
+    .screen {
+      padding: 40px 28px;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      opacity: 1; transform: translateY(0);
+      min-height: 580px;
+    }
+
+    .screen.hidden {
+      opacity: 0; transform: translateY(40px);
+      position: absolute; top: 0; left: 0; width: 100%;
+      pointer-events: none;
+    }
+
+    h1 { text-align: center; font-size: 2rem; margin-bottom: 32px; color: #e2e8f0; }
+    h2.welcome { text-align: center; font-size: 1.7rem; color: #818cf8; margin-bottom: 48px; }
+
+    .input-group { margin-bottom: 24px; position: relative; }
+
+    input {
+      width: 100%; padding: 16px 52px 16px 16px;
+      background: #334155; border: 2px solid #475569; border-radius: 12px;
+      color: white; font-size: 1.05rem; transition: all 0.3s;
+    }
+
+    input:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.3); }
+
+    label {
+      position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+      color: #94a3b8; pointer-events: none; transition: all 0.3s ease; font-size: 1.05rem;
+    }
+
+    input:focus + label,
+    input:not(:placeholder-shown) + label {
+      top: 8px; font-size: 0.8rem; color: #818cf8; background: #1e293b; padding: 0 6px;
+    }
+
+    .password-wrapper { position: relative; }
+
+    .toggle-password {
+      position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; font-size: 1.5rem; color: #94a3b8; cursor: pointer; padding: 0;
+    }
+
+    .main-btn {
+      width: 100%; padding: 16px; background: linear-gradient(90deg, #6366f1, #8b5cf6);
+      color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 700;
+      cursor: pointer; transition: all 0.35s; margin: 16px 0 8px;
+    }
+
+    .main-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(99,102,241,0.5); }
+
+    .github-btn {
+      width: 100%; padding: 14px; background: #24292e; color: white;
+      border: none; border-radius: 12px; font-size: 1.05rem; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px;
+      transition: all 0.3s; margin: 16px 0;
+    }
+
+    .github-btn:hover { background: #1f2328; }
+
+    .github-btn svg { width: 20px; height: 20px; fill: white; }
+
+    .or-divider { text-align: center; color: #94a3b8; margin: 16px 0; font-size: 0.95rem; }
+
+    .toggle-text { text-align: center; margin-top: 24px; color: #94a3b8; font-size: 0.95rem; }
+
+    .toggle-text a { color: #818cf8; font-weight: 600; text-decoration: none; cursor: pointer; }
+
+    .toggle-text a:hover { text-decoration: underline; }
+
+    .theme-toggle {
+      position: absolute; top: 16px; right: 16px;
+      background: rgba(255,255,255,0.1); border: none; border-radius: 50%;
+      width: 44px; height: 44px; font-size: 1.4rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Mensagem de sucesso */
+    #successMessage {
+      position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%);
+      background: rgba(99, 102, 241, 0.95); color: white;
+      padding: 20px 40px; border-radius: 16px; font-size: 1.3rem; font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      opacity: 0; transition: opacity 0.6s ease;
+      z-index: 1000; pointer-events: none;
+      text-align: center; white-space: nowrap;
+    }
+
+    #successMessage.show { opacity: 1; }
+
+    /* Dashboard - Executores */
+    .scripts-grid { display: grid; gap: 24px; margin: 40px 0; }
+
+    .script-btn {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 28px 24px;
+      font-size: 1.4rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.4s ease;
+      box-shadow: 0 10px 30px rgba(99,102,241,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .script-btn:hover {
+      transform: translateY(-8px) scale(1.03);
+      box-shadow: 0 20px 50px rgba(99,102,241,0.55);
+    }
+
+    .script-btn span.emoji { font-size: 3rem; }
+
+    .back-btn {
+      width: 100%;
+      padding: 16px;
+      background: transparent;
+      border: 2px solid #94a3b8;
+      color: #94a3b8;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 48px;
+    }
+
+    .back-btn:hover { background: rgba(148,163,184,0.15); }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeBtn">☀️</button>
+
+<div id="successMessage"></div>
+
+<div class="container">
+
+  <!-- Tela de Login -->
+  <div class="screen" id="loginScreen">
+    <h1>Bem-vindo de volta!</h1>
+    
+    <form id="frmLogin">
+      <div class="input-group">
+        <input type="text" id="loginUsuario" placeholder=" " required>
+        <label for="loginUsuario">Usuário ou e-mail</label>
+      </div>
+      <div class="input-group password-wrapper">
+        <input type="password" id="loginSenha" placeholder=" " required>
+        <label for="loginSenha">Senha</label>
+        <button type="button" class="toggle-password" onclick="togglePass('loginSenha')">👁️</button>
+      </div>
+      <button type="submit" class="main-btn">Entrar</button>
+    </form>
+
+    <button class="github-btn" onclick="githubLogin()">
+      <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      Entrar com GitHub
+    </button>
+
+    <div class="or-divider">ou</div>
+
+    <div class="toggle-text">
+      Ainda não tem conta? <a onclick="showRegister()">Cadastrar</a>
+    </div>
+  </div>
+
+  <!-- Tela de Cadastro -->
+  <div class="screen hidden" id="registerScreen">
+    <h1>Criar sua conta</h1>
+    
+    <form id="frmRegister">
+      <div class="input-group">
+        <input type="text" id="cadUsuario" placeholder=" " required>
+        <label for="cadUsuario">Usuário</label>
+      </div>
+      <div class="input-group">
+        <input type="email" id="cadEmail" placeholder=" " required>
+        <label for="cadEmail">E-mail</label>
+      </div>
+      <div class="input-group password-wrapper">
+        <input type="password" id="cadSenha" placeholder=" " required>
+        <label for="cadSenha">Senha</label>
+        <button type="button" class="toggle-password" onclick="togglePass('cadSenha')">👁️</button>
+      </div>
+      <button type="submit" class="main-btn">Cadastrar</button>
+    </form>
+
+    <button class="github-btn" onclick="githubLogin()">
+      <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      Cadastrar com GitHub
+    </button>
+
+    <div class="or-divider">ou</div>
+
+    <div class="toggle-text">
+      Já tem conta? <a onclick="showLogin()">Entrar</a>
+    </div>
+  </div>
+
+  <!-- Segunda aba: Executores -->
+  <div class="screen hidden" id="dashboardScreen">
+    <h2 class="welcome" id="welcomeUser">E aí, Fakita!</h2>
+    <h1>Executores</h1>
+
+    <div class="scripts-grid">
+      <a href="https://www.mediafire.com/file/6g19ctoqzz5g823/Roblox.Arceus.X.NEO.2.0.1.FIXED.2.0.apk/file" target="_blank" class="script-btn">
+        <span class="emoji">⚡</span> Arceus
+      </a>
+      <a href="https://www.mediafire.com/file/82kbkqpj23dwlmg/Delta-v2.707.apk/file" target="_blank" class="script-btn">
+        <span class="emoji">🌊</span> Delta
+      </a>
+      <a href="https://wearedevs.net/d/Punk%20X" target="_blank" class="script-btn">
+        <span class="emoji">🖤</span> Punk X
+      </a>
+      <a href="https://wearedevs.net/d/JJSploit-Android" target="_blank" class="script-btn">
+        <span class="emoji">💀</span> GG exploit
+      </a>
+      <a href="https://wearedevs.net/d/Ronix" target="_blank" class="script-btn">
+        <span class="emoji">👑</span> Ronix
+      </a>
+    </div>
+
+    <button class="back-btn" onclick="backToLogin()">Sair</button>
+  </div>
+
+</div>
+
+<script>
+  // Simulação de banco local (localStorage)
+  function getUsers() {
+    const users = localStorage.getItem('faxkt_users');
+    return users ? JSON.parse(users) : [];
+  }
+
+  function saveUsers(users) {
+    localStorage.setItem('faxkt_users', JSON.stringify(users));
+  }
+
+  // Toggle senha
+  function togglePass(id) {
+    const input = document.getElementById(id);
+    const btn = input.parentElement.querySelector('.toggle-password');
+    input.type = input.type === 'password' ? 'text' : 'password';
+    btn.textContent = input.type === 'password' ? '👁️' : '🙈';
+  }
+
+  // Mostra cadastro (esconde login)
+  function showRegister() {
+    document.getElementById('loginScreen').classList.add('hidden');
+    setTimeout(() => document.getElementById('registerScreen').classList.remove('hidden'), 300);
+  }
+
+  // Mostra login (esconde cadastro)
+  function showLogin() {
+    document.getElementById('registerScreen').classList.add('hidden');
+    setTimeout(() => document.getElementById('loginScreen').classList.remove('hidden'), 300);
+  }
+
+  // Mostra sucesso e vai pra executores
+  function showSuccessAndGoToDashboard(message, username = "Fakita") {
+    const msg = document.getElementById('successMessage');
+    msg.textContent = message;
+    msg.classList.add('show');
+
+    setTimeout(() => {
+      msg.classList.remove('show');
+      setTimeout(() => {
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('registerScreen').classList.add('hidden');
+        document.getElementById('dashboardScreen').classList.remove('hidden');
+        document.getElementById('welcomeUser').textContent = `E aí, ${username}!`;
+        localStorage.setItem('faxkt_logged_user', username);
+      }, 600);
+    }, 2000);
+  }
+
+  // Volta pra login
+  function backToLogin() {
+    document.getElementById('dashboardScreen').classList.add('hidden');
+    localStorage.removeItem('faxkt_logged_user');
+    setTimeout(() => document.getElementById('loginScreen').classList.remove('hidden'), 400);
+  }
+
+  // Cadastro
+  document.getElementById('frmRegister').addEventListener('submit', e => {
+    e.preventDefault();
+    const username = document.getElementById('cadUsuario').value.trim();
+    const email = document.getElementById('cadEmail').value.trim();
+    const password = document.getElementById('cadSenha').value;
+
+    if (!username || !email || !password) {
+      alert('Preencha todos os campos!');
+      return;
+    }
+
+    const users = getUsers();
+    if (users.some(u => u.username === username || u.email === email)) {
+      alert('Usuário ou email já cadastrado!');
+      return;
+    }
+
+    users.push({ username, email, password }); // senha em texto puro (demo)
+    saveUsers(users);
+
+    showSuccessAndGoToDashboard("Conta criada com sucesso! 🎉", username);
+  });
+
+  // Login
+  document.getElementById('frmLogin').addEventListener('submit', e => {
+    e.preventDefault();
+    const identifier = document.getElementById('loginUsuario').value.trim();
+    const password = document.getElementById('loginSenha').value;
+
+    const users = getUsers();
+    const user = users.find(u => (u.username === identifier || u.email === identifier) && u.password === password);
+
+    if (user) {
+      showSuccessAndGoToDashboard("Login realizado com sucesso! 🚀", user.username);
+    } else {
+      alert('Credenciais inválidas ou usuário não cadastrado!');
+    }
+  });
+
+  // GitHub (mantido)
+  function githubLogin() {
+    const clientId = 'SEU_CLIENT_ID_AQUI';
+    const redirectUri = `${window.location.origin}/callback.html`;
+    const scope = 'user:email';
+
+    const state = Math.random().toString(36).substring(2);
+    localStorage.setItem('github_state', state);
+
+    const url = `https://github.com/login/oauth/authorize?client_id=\( {clientId}&redirect_uri= \){encodeURIComponent(redirectUri)}&scope=\( {scope}&state= \){state}`;
+
+    window.location.href = url;
+  }
+
+  // Tema toggle
+  document.getElementById('themeBtn').addEventListener('click', () => {
+    document.body.classList.toggle('light');
+    document.getElementById('themeBtn').textContent = document.body.classList.contains('light') ? '🌙' : '☀️';
+  });
+
+  // Retorno GitHub
+  if (window.location.search.includes('code=')) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const state = urlParams.get('state');
+    const savedState = localStorage.getItem('github_state');
+
+    if (state === savedState) {
+      showSuccessAndGoToDashboard("Login com GitHub realizado! 🔥", "Usuário GitHub");
+      localStorage.removeItem('github_state');
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else {
+      alert('Estado inválido! Possível ataque CSRF.');
+    }
+  }
+
+  // Verifica se já está logado
+  window.onload = () => {
+    const loggedUser = localStorage.getItem('faxkt_logged_user');
+    if (loggedUser) {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('registerScreen').classList.add('hidden');
+      document.getElementById('dashboardScreen').classList.remove('hidden');
+      document.getElementById('welcomeUser').textContent = `E aí, ${loggedUser}!`;
+    }
+  };
+</script>
+
+</body>
+</html>
